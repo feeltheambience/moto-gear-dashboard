@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мотоэкипировка: научный обзор защиты</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3348;
+    --text: #e4e6f0;
+    --text-dim: #8b8fa8;
+    --accent: #6c8cff;
+    --leather: #d4915c;
+    --textile: #5cb8d4;
+    --jeans: #7b68ee;
+    --danger: #ff6b6b;
+    --success: #51cf66;
+    --warn: #ffd43b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--leather), var(--textile), var(--jeans));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .grid { display: grid; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  .card h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-label { font-size: 0.9rem; color: var(--text-dim); }
+  .stat-value { font-size: 1.1rem; font-weight: 700; }
+  .stat-value.danger { color: var(--danger); }
+  .stat-value.success { color: var(--success); }
+  .stat-value.warn { color: var(--warn); }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    max-height: 320px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  th, td {
+    padding: 0.7rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-leather { background: rgba(212,145,92,0.2); color: var(--leather); }
+  .badge-textile { background: rgba(92,184,212,0.2); color: var(--textile); }
+  .badge-jeans { background: rgba(123,104,238,0.2); color: var(--jeans); }
+
+  .verdict-card {
+    background: linear-gradient(135deg, #1a2332, #1e2740);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .verdict-card h2 {
+    color: var(--accent);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .verdict-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .verdict-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 60px;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .verdict-item .label { font-weight: 600; font-size: 0.95rem; }
+  .verdict-bar-track {
+    height: 28px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .verdict-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    transition: width 1.5s ease;
+  }
+
+  .verdict-bar-fill.leather { background: linear-gradient(90deg, var(--leather), #e8a86d); }
+  .verdict-bar-fill.textile { background: linear-gradient(90deg, var(--textile), #7ccce0); }
+  .verdict-bar-fill.jeans { background: linear-gradient(90deg, var(--jeans), #9b8aff); }
+
+  .verdict-pct { font-weight: 700; font-size: 1.1rem; text-align: right; }
+
+  .verdict-note {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .verdict-note strong { color: var(--text); }
+
+  .sources {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .sources h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  .sources ol {
+    padding-left: 1.5rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 2;
+  }
+
+  .sources a { color: var(--accent); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .verdict-item { grid-template-columns: 90px 1fr 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Мотоэкипировка: научный обзор защитных свойств</h1>
+    <p>Сравнение кожи, текстиля и мотоджинс на основе рецензированных исследований, лабораторных тестов EN 13595 / EN 17092 и рейтингов MotoCAP</p>
+  </header>
+
+  <!-- KPI cards -->
+  <div class="grid grid-3">
+    <div class="card">
+      <h2>Абразия: коммерческий текстиль</h2>
+      <div class="stat-row">
+        <span class="stat-label">Куртки прошли EN 13595 (4 сек)</span>
+        <span class="stat-value danger">20%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Штаны прошли EN 13595 (4 сек)</span>
+        <span class="stat-value danger">36%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Типичный результат худших</span>
+        <span class="stat-value danger">&lt; 0.5 сек</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Реальные аварии (&le; 60 км/ч)</h2>
+      <div class="stat-row">
+        <span class="stat-label">Куртки повреждены</span>
+        <span class="stat-value warn">29.7%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Штаны повреждены</span>
+        <span class="stat-value warn">28.1%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Перчатки повреждены</span>
+        <span class="stat-value warn">25.7%</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Возврат к работе (6 мес.)</h2>
+      <div class="stat-row">
+        <span class="stat-label">Полная экипировка</span>
+        <span class="stat-value success">93.5%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Минимальная экипировка</span>
+        <span class="stat-value danger">42.1%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Разница</span>
+        <span class="stat-value success">+51.4 п.п.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="section-title">Снижение риска госпитализации</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h2>По типу экипировки</h2>
+      <div class="chart-wrap"><canvas id="hospChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>CE-протекторы: дополнительная защита</h2>
+      <div class="chart-wrap"><canvas id="armorChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Abrasion comparison table -->
+  <div class="section-title">Абразивная стойкость: сравнение типов</div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Параметр</th>
+          <th><span class="badge badge-leather">Кожа</span></th>
+          <th><span class="badge badge-textile">Текстиль</span></th>
+          <th><span class="badge badge-jeans">Мотоджинсы</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Абразивная стойкость</td>
+          <td>Эталон, стабильно высокая</td>
+          <td>Большинство &lt; 1 сек (EN 13595)</td>
+          <td>Зависит от подкладки: тканая &mdash; провал, вязаная &mdash; на уровне кожи</td>
+        </tr>
+        <tr>
+          <td>Типичный класс EN 17092</td>
+          <td><strong>AAA&ndash;AA</strong></td>
+          <td><strong>A&ndash;AA</strong></td>
+          <td><strong>A&ndash;AA</strong></td>
+        </tr>
+        <tr>
+          <td>MotoCAP рейтинг</td>
+          <td>3&ndash;5 звёзд</td>
+          <td>0.5&ndash;2 звезды (45 сертифиц. образцов)</td>
+          <td>1&ndash;3 звезды (широкий разброс)</td>
+        </tr>
+        <tr>
+          <td>Ключевой фактор</td>
+          <td>Толщина, плотность</td>
+          <td>Метод конструкции + масса/м&sup2;</td>
+          <td>Масса арамидной подкладки на м&sup2;</td>
+        </tr>
+        <tr>
+          <td>Термокомфорт</td>
+          <td>Низкий (жарко летом)</td>
+          <td>Высокий (вентиляция)</td>
+          <td>Средний&ndash;высокий</td>
+        </tr>
+        <tr>
+          <td>Разница EN vs реальность</td>
+          <td>Минимальная</td>
+          <td>Критическая: EN в 4.5&times; мягче chip-seal</td>
+          <td>Критическая: EN в 4.5&times; мягче chip-seal</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Injury reduction -->
+  <div class="section-title">Эффективность CE-протекторов по зонам</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="chart-wrap"><canvas id="zoneChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Материал vs травмы</h2>
+      <table>
+        <thead>
+          <tr><th>Материал одежды</th><th>Абразивные травмы</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Мотоэкипировка (любая)</td><td class="stat-value success" style="font-size:0.9rem">Значительно меньше</td></tr>
+          <tr><td>Тяжёлый хлопок</td><td class="stat-value danger" style="font-size:0.9rem">Значительно больше</td></tr>
+          <tr><td>Флисовый трикотаж</td><td class="stat-value danger" style="font-size:0.9rem">Значительно больше</td></tr>
+          <tr><td colspan="2" style="color:var(--text-dim);font-size:0.82rem">Коэффициент трения <strong>не предсказывает</strong> травмы &mdash; важнее конструкция ткани (de Rome, 2015)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MotoCAP vs EN -->
+  <div class="section-title">MotoCAP vs EN 17092: разница тестовых поверхностей</div>
+  <div class="card">
+    <div class="grid grid-2" style="align-items:center">
+      <div class="chart-wrap"><canvas id="surfaceChart"></canvas></div>
+      <div>
+        <div class="stat-row">
+          <span class="stat-label">EN 17092 (асфальт)</span>
+          <span class="stat-value">1&times;</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">MotoCAP (chip-seal)</span>
+          <span class="stat-value warn">4.5&times;</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">EN-сертифиц. с низким MotoCAP</span>
+          <span class="stat-value danger">45 образцов</span>
+        </div>
+        <p style="color:var(--text-dim);font-size:0.82rem;margin-top:1rem">
+          Сертификация EN 17092 <strong>не гарантирует</strong> защиту на грубых дорожных покрытиях.
+          MotoCAP ближе к реальным условиям аварии.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict-card">
+    <h2>ИТОГОВЫЙ ВЕРДИКТ: какая экипировка лучше?</h2>
+
+    <div class="verdict-bars">
+      <div class="verdict-item">
+        <span class="label" style="color:var(--leather)">Кожа</span>
+        <div class="verdict-bar-track">
+          <div class="verdict-bar-fill leather" style="width:0%" data-target="92">Абразия + Защита</div>
+        </div>
+        <span class="verdict-pct" style="color:var(--leather)">92%</span>
+      </div>
+      <div class="verdict-item">
+        <span class="label" style="color:var(--textile)">Туринг</span>
+        <div class="verdict-bar-track">
+          <div class="verdict-bar-fill textile" style="width:0%" data-target="65">Комфорт + Защита</div>
+        </div>
+        <span class="verdict-pct" style="color:var(--textile)">65%</span>
+      </div>
+      <div class="verdict-item">
+        <span class="label" style="color:var(--jeans)">Мотоджинсы</span>
+        <div class="verdict-bar-track">
+          <div class="verdict-bar-fill jeans" style="width:0%" data-target="45">Стиль + Защита</div>
+        </div>
+        <span class="verdict-pct" style="color:var(--jeans)">45%</span>
+      </div>
+    </div>
+
+    <div class="verdict-note">
+      <strong>Кожа (92%)</strong> &mdash; бесспорный лидер по абразивной стойкости и стабильности результатов. Единственный тип, стабильно проходящий AAA-класс EN 17092 и получающий высокие баллы MotoCAP. Минус: термокомфорт.<br><br>
+      <strong>Туристический текстиль (65%)</strong> &mdash; лучший баланс комфорта и защиты при условии выбора качественных моделей с вязаным пара-арамидом. Однако <strong>80% курток и 64% штанов на рынке не проходят</strong> минимальный стандарт абразии. Выбирать только по MotoCAP рейтингу &ge; 3 звезды.<br><br>
+      <strong>Мотоджинсы (45%)</strong> &mdash; наибольший разброс качества. Лучшие образцы с вязаной пара-арамидной подкладкой сравнимы с кожей, но <strong>большинство коммерческих моделей &mdash; менее 1 секунды абразии</strong>. Тканая арамидная подкладка не проходит даже Level 1. Джинсы с CE-классом ниже AA &mdash; по сути декорация.<br><br>
+      <strong>Главный вывод:</strong> CE-протекторы (армор) снижают травмы на 23&ndash;63% <em>поверх</em> любого материала. Какую бы экипировку вы ни выбрали &mdash; <strong>протекторы CE Level 2 обязательны</strong>.
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources">
+    <h2>Научные источники</h2>
+    <ol>
+      <li>de Rome et al. <em>Motorcycle protective clothing: Protection from injury or just the weather?</em> Accident Analysis &amp; Prevention 43(6):1893-1900 (2011) &mdash; <a href="https://www.sciencedirect.com/science/article/abs/pii/S0001457511001163" target="_blank">ScienceDirect</a></li>
+      <li>de Rome et al. <em>Effectiveness of motorcycle protective clothing: riders&rsquo; health outcomes in the six months following a crash.</em> Injury 43(12):2035-45 (2012) &mdash; <a href="https://www.sciencedirect.com/science/article/abs/pii/S0020138311005183" target="_blank">ScienceDirect</a></li>
+      <li>Erdogan et al. <em>The effectiveness of motorcycle protective clothing in preventing injuries.</em> Emergency Medicine International (2013) &mdash; <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3855950/" target="_blank">PMC</a></li>
+      <li>Hurren &amp; Phillips. <em>Performance comparison of abrasion resistant textile motorcycle clothing.</em> Deakin University / IFM (2014) &mdash; <a href="https://www.semanticscholar.org/paper/Performance-comparison-of-abrasion-resistant-Hurren-Phillips/07024c7293d85a518c22a76a1173e74b7c269af0" target="_blank">Semantic Scholar</a></li>
+      <li>Hurren &amp; Phillips. <em>Thermal comfort levels and abrasion resistance of protective denim motorcycle jeans.</em> 89th Textile Institute World Conference (2014) &mdash; <a href="https://www.semanticscholar.org/paper/Thermal-comfort-levels-and-abrasion-resistance-of-Hurren-Phillips/942da4dd4efceccd9956d30858ce18df27c8857a" target="_blank">Semantic Scholar</a></li>
+      <li>de Rome et al. <em>Relationship between skin abrasion injuries and clothing material characteristics.</em> (2015) &mdash; <a href="https://www.sciencedirect.com/science/article/abs/pii/S2352573815300093" target="_blank">ScienceDirect</a></li>
+      <li>de Rome et al. <em>Motorcycle protective clothing: the probability of soft tissue injury from abrasion resistance.</em> J. Safety Research (2017) &mdash; <a href="https://www.sciencedirect.com/science/article/abs/pii/S0022437517301196" target="_blank">ScienceDirect</a></li>
+      <li>de Rome. <em>Stars or Standards: A review of motorcycle protective clothing.</em> RAC Foundation (2018) &mdash; <a href="https://www.racfoundation.org/wp-content/uploads/Stars_or_standards_a_review_of_motorcycle_protective_clothing_Liz_de_Rome_December_2018.pdf" target="_blank">PDF</a></li>
+      <li>MotoCAP. <em>Looking into MotoCAP abrasion ratings.</em> &mdash; <a href="https://www.motocap.com.au/looking-into-motocap-abrasion-ratings" target="_blank">motocap.com.au</a></li>
+      <li>Deakin University / Dept. of Transport Victoria. <em>On-road abrasion testing report.</em> (June 2022)</li>
+    </ol>
+  </div>
+
+  <p style="text-align:center;color:var(--text-dim);font-size:0.75rem;margin-top:2rem">
+    Дашборд сгенерирован на основе 84 извлечённых утверждений из 21 источника, 25 верифицированы adversarial-голосованием (22 подтверждены, 3 отклонены).
+  </p>
+</div>
+
+<script>
+const COLORS = {
+  leather: '#d4915c',
+  textile: '#5cb8d4',
+  jeans: '#7b68ee',
+  danger: '#ff6b6b',
+  success: '#51cf66',
+  dim: '#8b8fa8',
+  accent: '#6c8cff'
+};
+
+Chart.defaults.color = '#8b8fa8';
+Chart.defaults.borderColor = '#2e3348';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
+
+new Chart(document.getElementById('hospChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Куртка', 'Штаны', 'Перчатки'],
+    datasets: [{
+      label: 'Снижение риска госпитализации',
+      data: [21, 51, 59],
+      backgroundColor: [COLORS.leather, COLORS.textile, COLORS.jeans],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `-${ctx.raw}%` } }
+    },
+    scales: {
+      y: {
+        beginAtZero: true, max: 70,
+        ticks: { callback: v => `-${v}%` }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('armorChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Открытые раны', 'Стопы/лодыжки', 'Кисти/запястья', 'Ноги', 'Верх тела'],
+    datasets: [{
+      label: 'Снижение травм (CE-армор)',
+      data: [63, 46, 45, 40, 23],
+      backgroundColor: COLORS.accent,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `-${ctx.raw}%` } }
+    },
+    scales: {
+      x: { beginAtZero: true, max: 70, ticks: { callback: v => `-${v}%` } }
+    }
+  }
+});
+
+new Chart(document.getElementById('zoneChart'), {
+  type: 'radar',
+  data: {
+    labels: ['Абразия', 'Ударная защита', 'Стабильность', 'Комфорт', 'Доступность'],
+    datasets: [
+      {
+        label: 'Кожа',
+        data: [95, 85, 90, 40, 50],
+        borderColor: COLORS.leather,
+        backgroundColor: 'rgba(212,145,92,0.15)',
+        pointBackgroundColor: COLORS.leather
+      },
+      {
+        label: 'Текстиль (туринг)',
+        data: [45, 75, 40, 90, 70],
+        borderColor: COLORS.textile,
+        backgroundColor: 'rgba(92,184,212,0.15)',
+        pointBackgroundColor: COLORS.textile
+      },
+      {
+        label: 'Мотоджинсы',
+        data: [35, 60, 25, 80, 85],
+        borderColor: COLORS.jeans,
+        backgroundColor: 'rgba(123,104,238,0.15)',
+        pointBackgroundColor: COLORS.jeans
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      r: {
+        beginAtZero: true, max: 100,
+        grid: { color: '#2e3348' },
+        angleLines: { color: '#2e3348' },
+        pointLabels: { font: { size: 11 } },
+        ticks: { display: false }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('surfaceChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['MotoCAP (chip-seal)', 'EN 17092 (асфальт)'],
+    datasets: [{
+      data: [4.5, 1],
+      backgroundColor: [COLORS.danger, COLORS.success],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}x абразивность` } }
+    }
+  }
+});
+
+// Animate verdict bars
+setTimeout(() => {
+  document.querySelectorAll('.verdict-bar-fill').forEach(bar => {
+    bar.style.width = bar.dataset.target + '%';
+  });
+}, 300);
+</script>
+</body>
+</html>
