@@ -293,6 +293,80 @@
 
   .verdict-bottom strong { color: var(--accent); }
 
+  .models {
+    margin-top: 2rem;
+  }
+
+  .models-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .model-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .model-card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .model-card .model-type {
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .model-item {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .model-item:last-child { border-bottom: none; }
+
+  .model-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .model-meta {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 0.15rem;
+    line-height: 1.5;
+  }
+
+  .model-stars {
+    color: var(--warn);
+    font-size: 0.82rem;
+  }
+
+  .model-price {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  .model-tag {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-right: 0.3rem;
+  }
+
+  .tag-best { background: rgba(81,207,102,0.15); color: var(--success); }
+  .tag-value { background: rgba(255,212,59,0.15); color: var(--warn); }
+  .tag-aaa { background: rgba(108,140,255,0.15); color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .models-grid { grid-template-columns: 1fr; }
+  }
+
   .fresh-data {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -593,6 +667,110 @@
   </div>
 
   <!-- Fresh data section -->
+  <!-- Concrete model recommendations -->
+  <div class="models">
+    <div class="section-title">Конкретные модели: что покупать</div>
+    <div class="section-desc">Модели с лучшими результатами в независимых тестах MotoCAP и сертификации EN 17092. Цены указаны рекомендованные на момент тестирования.</div>
+
+    <div class="models-grid">
+      <!-- Leather -->
+      <div class="model-card" style="border-color:rgba(212,145,92,0.3)">
+        <h3 style="color:var(--leather)">Кожа</h3>
+        <div class="model-type" style="color:var(--text-dim)">Максимальная защита от асфальта</div>
+
+        <div class="model-item">
+          <div class="model-name">Dainese Super Speed 4 <span class="model-tag tag-best">топ</span></div>
+          <div class="model-meta">Куртка. Полнозернистая воловья кожа, протекторы плечи + локти + спина. Класс AA.</div>
+          <div class="model-meta">Для спорта и трека. Плотная посадка, хорошая вентиляция для кожи.</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Rev'it Xena 4 <span class="model-tag tag-best">топ 2025</span></div>
+          <div class="model-meta">Куртка (женская). Лучший результат MotoCAP 2025 среди кожаных курток.</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Rev'it Ignition H2O</div>
+          <div class="model-meta">Штаны. Лучшие кожаные штаны MotoCAP 2024. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-price">~$649</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Alpinestars Blacktrack</div>
+          <div class="model-meta">Куртка. Полнозернистая кожа + Nucleon протекторы. Класс A. Баланс стиля и защиты.</div>
+        </div>
+      </div>
+
+      <!-- Textile -->
+      <div class="model-card" style="border-color:rgba(92,184,212,0.3)">
+        <h3 style="color:var(--textile)">Текстиль (туринг)</h3>
+        <div class="model-type" style="color:var(--text-dim)">Баланс комфорта и защиты для дальних поездок</div>
+
+        <div class="model-item">
+          <div class="model-name">Dririder Climate EXO 4 <span class="model-tag tag-best">топ 2024</span></div>
+          <div class="model-meta">Куртка (муж). Первая текстильная куртка с 5 звёздами MotoCAP. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-price">~$400</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Triumph Braddan Wax <span class="model-tag tag-best">топ 2024</span></div>
+          <div class="model-meta">Куртка (жен). Тоже 5 звёзд MotoCAP. Вощёная ткань, классический стиль. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-price">~$573</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Black Pup Moto Tallarook ADV</div>
+          <div class="model-meta">Штаны. Лучшие текстильные штаны MotoCAP 2024. Водонепроницаемые, для приключений.</div>
+          <div class="model-price">~$399</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">1 Tonne Charcoal Wax <span class="model-tag tag-value">бюджет</span></div>
+          <div class="model-meta">Куртка. 4 звезды MotoCAP 2025 за минимальные деньги. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-price">~$279 NZD</div>
+        </div>
+      </div>
+
+      <!-- Jeans -->
+      <div class="model-card" style="border-color:rgba(123,104,238,0.3)">
+        <h3 style="color:var(--jeans)">Мотоджинсы</h3>
+        <div class="model-type" style="color:var(--text-dim)">На каждый день &mdash; выглядят как обычные джинсы</div>
+
+        <div class="model-item">
+          <div class="model-name">Finn Moto 881 <span class="model-tag tag-best">топ 2025</span><span class="model-tag tag-aaa">AAA</span></div>
+          <div class="model-meta">Первые и единственные джинсы с 5 звёздами MotoCAP. Истирание 10/10. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-meta">Абсолютный лидер среди джинс &mdash; защищают на уровне кожи.</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Finn Moto 882 <span class="model-tag tag-value">бюджет</span></div>
+          <div class="model-meta">Младшая модель. 4 звезды MotoCAP, но вдвое дешевле. <span class="model-stars">&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="model-price">~$248</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">By City Shield II <span class="model-tag tag-aaa">AAA</span></div>
+          <div class="model-meta">Однослойные, без подкладки. Самые доступные джинсы класса AAA. Один слой = максимальный комфорт в жару.</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">Pando Moto SKIN UH AAA <span class="model-tag tag-aaa">AAA</span></div>
+          <div class="model-meta">Защитные подштанники. Надеваете под обычные джинсы &mdash; получаете 4 звезды MotoCAP. Никто не узнает.</div>
+        </div>
+
+        <div class="model-item">
+          <div class="model-name">TKD Max Dirty Combo</div>
+          <div class="model-meta">Лучшие джинсы MotoCAP 2024 (муж). С подкладкой CoolMax &mdash; не жарко летом.</div>
+          <div class="model-price">~$340</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:1.5rem">
+      <strong>Протекторы покупаются отдельно!</strong> Даже лучшие джинсы и куртки часто идут без вставок или с базовыми Level 1. Лучшие протекторы 2025 по MotoCAP: <strong>D3O Aero Pro Level 2</strong> (10/10 для плеч, локтей, коленей) и <strong>D3O Ghost Level 2</strong> (10/10 для бёдер, тонкие и гибкие &mdash; незаметны в штанах). Покупайте отдельно и вставляйте в карманы экипировки.
+    </div>
+  </div>
+
   <div class="fresh-data">
     <h2>Свежие данные (2022&ndash;2025)</h2>
     <div class="fresh-desc">Основные исследования были опубликованы в 2011&ndash;2018. Вот что нового появилось за последние годы.</div>
